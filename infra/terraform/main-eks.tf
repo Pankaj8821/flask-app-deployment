@@ -1,4 +1,13 @@
 ###########################
+# Service-linked role for EKS managed nodegroups
+# (prevents AccessDenied: unable to assume service-linked role)
+###########################
+resource "aws_iam_service_linked_role" "eks_nodegroup" {
+  aws_service_name = "eks-nodegroup.amazonaws.com"
+  description      = "Service-linked role used by Amazon EKS managed node groups"
+}
+
+###########################
 # IAM Role for EKS Cluster
 ###########################
 
@@ -16,7 +25,7 @@ data "aws_iam_policy_document" "eks_assume_role" {
 resource "aws_iam_role" "eks_cluster_role" {
   name               = "${var.cluster_name}-eks-role"
   assume_role_policy = data.aws_iam_policy_document.eks_assume_role.json
-  tags = var.tags
+  tags               = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "eks_cluster_attach" {
@@ -24,8 +33,14 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_attach" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
 
+# optional: attach AmazonEKSServicePolicy if you want cluster role to manage AWS resources
+resource "aws_iam_role_policy_attachment" "eks_cluster_service_attach" {
+  role       = aws_iam_role.eks_cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+}
+
 ###########################
-# IAM Role for Worker Nodes
+# IAM Role for Worker Nodes (managed node group role)
 ###########################
 
 data "aws_iam_policy_document" "worker_assume_role" {
@@ -42,7 +57,7 @@ data "aws_iam_policy_document" "worker_assume_role" {
 resource "aws_iam_role" "eks_node_role" {
   name               = "${var.cluster_name}-node-role"
   assume_role_policy = data.aws_iam_policy_document.worker_assume_role.json
-  tags = var.tags
+  tags               = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "node_policy1" {
@@ -70,7 +85,7 @@ resource "aws_eks_cluster" "eks" {
   version  = "1.29"
 
   vpc_config {
-    subnet_ids = concat(aws_subnet.public[*].id, aws_subnet.private[*].id)
+    subnet_ids              = concat(aws_subnet.public[*].id, aws_subnet.private[*].id)
     endpoint_public_access  = true
     endpoint_private_access = false
   }
@@ -79,7 +94,8 @@ resource "aws_eks_cluster" "eks" {
   tags = var.tags
 
   depends_on = [
-    aws_iam_role_policy_attachment.eks_cluster_attach
+    aws_iam_role_policy_attachment.eks_cluster_attach,
+    aws_iam_role_policy_attachment.eks_cluster_service_attach
   ]
 }
 
@@ -104,7 +120,9 @@ resource "aws_eks_node_group" "ng" {
 
   tags = var.tags
 
+  # Ensure the service-linked role is created before node group creation
   depends_on = [
-    aws_eks_cluster.eks
+    aws_eks_cluster.eks,
+    aws_iam_service_linked_role.eks_nodegroup
   ]
 }
