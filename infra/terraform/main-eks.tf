@@ -40,7 +40,7 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_service_attach" {
 }
 
 ###########################
-# IAM Role for Worker Nodes (managed node group role)
+# IAM Role for Worker Nodes
 ###########################
 
 data "aws_iam_policy_document" "worker_assume_role" {
@@ -120,7 +120,7 @@ resource "aws_eks_node_group" "ng" {
 
   tags = var.tags
 
-  # Ensure the service-linked role is created before node group creation
+  # Ensure the service-linked role is present before creating the node group
   depends_on = [
     aws_eks_cluster.eks,
     aws_iam_service_linked_role.eks_nodegroup
