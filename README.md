@@ -1,6 +1,6 @@
 # Project Overview:
 
-# This project demonstrates how to deploy a Django application using Terraform, Amazon EKS, and the AWS ALB Ingress Controller. The infrastructure is fully provisioned using Terraform, including components like VPC, EKS Cluster, ALB, S3 Bucket, OIDC Provider, and ALB Ingress Controller.
+# This project demonstrates how to deploy Flask app using Terraform, Amazon EKS, and the AWS ALB Ingress Controller. The infrastructure is fully provisioned using Terraform, including components like VPC, EKS Cluster, ALB, S3 Bucket, OIDC Provider, and ALB Ingress Controller.
 
 # We use the canary deployment strategy for smooth rollouts. For monitoring, Prometheus and Grafana are installed via Helm charts, enabling full observability of the application and infrastructure.
 
