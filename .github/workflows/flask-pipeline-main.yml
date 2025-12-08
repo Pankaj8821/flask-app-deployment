@@ -1,0 +1,71 @@
+
+
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1    # AWS region
+      CLUSTER_NAME: flask-eks-cluster
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      run: docker --version
+      #uses: docker/setup-buildx-action@v3
+
+    - name: Login to DockerHub1
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and Push Docker Image
+      run: |
+        cd projects/app
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ github.run_number }} .
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest .
+        docker push ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ github.run_number }}
+        docker push ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.6.6
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    - name: Terraform Init
+      working-directory: infra/terraform
+      run: terraform init  -reconfigure    # -migrate-state 0r -reconfigure (terraform init -migrate-state -reconfigure)
+
+    - name: Terraform Plan
+      working-directory: infra/terraform
+      run: terraform plan
+    - name: Terraform Apply
+      working-directory: infra/terraform
+      run: terraform apply -auto-approve
+    - name: Install kubectl
+      run: |
+          KUBECTL_VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+          curl -LO "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+    - name: Configure kubectl with EKS
+      run: |
+          aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
+    - name: Deployment Apply
+      #working-directory: manifests
+      run: |
+          kubectl apply -f manifests/
+          
