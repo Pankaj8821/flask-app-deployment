@@ -29,7 +29,7 @@ jobs:
 
     - name: Build and Push Docker Image
       run: |
-        cd projects/app
+        cd project/app
         docker build -t ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ github.run_number }} .
         docker build -t ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest .
         docker push ${{ secrets.DOCKER_USERNAME }}/flaskapp:${{ github.run_number }}
