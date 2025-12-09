@@ -17,13 +17,10 @@ spec:
       labels:
         app: my-app
         version: v1
-     
     spec:
       containers:
       - name: flask
         image: pankaj6262/flaskapp:latest
+        imagePullPolicy: Always
         ports:
-        - name: containerPort
-          containerPort: 8080
-       
-  
+        - containerPort: 8080
