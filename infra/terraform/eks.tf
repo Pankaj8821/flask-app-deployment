@@ -65,10 +65,18 @@ resource "aws_iam_role_policy_attachment" "node_policy3" {
 resource "aws_eks_cluster" "eks" {
   name     = var.cluster_name
   role_arn = aws_iam_role.eks_cluster_role.arn
-  version  = "1.29"
+  version  = var.k8s_version
 
   vpc_config {
-    subnet_ids = concat(aws_subnet.public[].id, aws_subnet.private[].id)
+    # Correct splat + concat syntax to merge public & private subnet ids
+    subnet_ids = concat(
+      aws_subnet.public[*].id,
+      aws_subnet.private[*].id
+    )
+
+    # optional: adjust if you want private-only access
+    endpoint_private_access = false
+    endpoint_public_access  = true
   }
 
   enabled_cluster_log_types = ["api", "authenticator", "controllerManager"]
@@ -86,7 +94,9 @@ resource "aws_eks_node_group" "ng" {
   cluster_name    = aws_eks_cluster.eks.name
   node_group_name = "${var.cluster_name}-ng"
   node_role_arn   = aws_iam_role.eks_node_role.arn
-  subnet_ids      = aws_subnet.private[*].id
+
+  # place worker nodes in private subnets (recommended)
+  subnet_ids = aws_subnet.private[*].id
 
   scaling_config {
     desired_size = var.desired_size
