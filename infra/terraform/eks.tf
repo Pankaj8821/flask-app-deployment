@@ -128,20 +128,3 @@ resource "aws_security_group_rule" "eks_allow_8080_from_internet" {
   # ensure the EKS cluster is created first
   depends_on = [aws_eks_cluster.eks]
 }
-
-# Explicit egress (optional; most EKS SGs already allow egress)
-resource "aws_security_group_rule" "eks_allow_all_egress_explicit" {
-  type              = "egress"
-  description       = "Allow all outbound traffic from cluster SG (explicit)"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
-
-  security_group_id = aws_eks_cluster.eks.vpc_config[0].cluster_security_group_id
-
-  depends_on = [aws_eks_cluster.eks]
-}
-
-
