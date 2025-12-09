@@ -1,6 +1,6 @@
 # Project Overview:
 
-https://github.com/Pankaj8821/flask-app-deployment/blob/main/flaskapp.png
+![Image Description](https://github.com/Pankaj8821/flask-app-deployment/blob/main/flaskapp.png)
 
 # This project demonstrates how to deploy Flask app using Terraform, Amazon EKS, and the AWS ALB Ingress Controller. The infrastructure is fully provisioned using Terraform, including components like VPC, EKS Cluster, ALB, S3 Bucket.
 
