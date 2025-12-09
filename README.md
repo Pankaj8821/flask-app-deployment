@@ -2,7 +2,7 @@
 
 ![Image Description](https://github.com/Pankaj8821/flask-app-deployment/blob/main/flaskapp.png)
 
-# This project demonstrates how to deploy Flask app using Terraform, Amazon EKS, and the AWS ALB Ingress Controller. The infrastructure is fully provisioned using Terraform, including components like VPC, EKS Cluster, ALB, S3 Bucket.
+# This project demonstrates how to deploy Flask app using Terraform, Amazon EKS, and the AWS Application load balancer. The infrastructure is fully provisioned using Terraform, including components like VPC, EKS Cluster, ALB, S3 Bucket.
 
 We have created a CI/CD pipeline using GitHub Actions, which utilizes AWS and Docker Hub secrets for secure deployments.
 
@@ -14,7 +14,7 @@ We have created a CI/CD pipeline using GitHub Actions, which utilizes AWS and Do
       aws s3api create-bucket \
         --bucket my-eks-terraform-state \
         --region us-east-1
-#       --create-bucket-configuration #LocationConstraint=us-west-2
+     --create-bucket-configuration #LocationConstraint=us-west-2
     
 NOTE  Not use  -- create-bucket-configuration LocationConstraint in us-east-1
 Enable versioning and encryption (recommended for Terraform)
