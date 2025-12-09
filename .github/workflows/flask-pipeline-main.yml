@@ -65,5 +65,6 @@ jobs:
     - name: Deployment Apply
       #working-directory: manifests
       run: |
+          kubectl create namespace myapp
           kubectl apply -f manifests/
           
