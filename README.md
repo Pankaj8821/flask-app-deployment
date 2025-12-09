@@ -1,17 +1,10 @@
 # Project Overview:
 
-# This project demonstrates how to deploy Flask app using Terraform, Amazon EKS, and the AWS ALB Ingress Controller. The infrastructure is fully provisioned using Terraform, including components like VPC, EKS Cluster, ALB, S3 Bucket, OIDC Provider, and ALB Ingress Controller.
-
-# We use the canary deployment strategy for smooth rollouts. For monitoring, Prometheus and Grafana are installed via Helm charts, enabling full observability of the application and infrastructure.
+# This project demonstrates how to deploy Flask app using Terraform, Amazon EKS, and the AWS ALB Ingress Controller. The infrastructure is fully provisioned using Terraform, including components like VPC, EKS Cluster, ALB, S3 Bucket.
 
 We have created a CI/CD pipeline using GitHub Actions, which utilizes AWS and Docker Hub secrets for secure deployments.
 
-# This is my GitHub Action Workflow File  -->  https://github.com/Pankaj8821/Dubai-Project/blob/main/.github/workflows/Django-project.yaml
-
-
-# Infrastructure Tree Diagram for Dubai-Project
-![image](https://github.com/user-attachments/assets/c479a72e-8d44-4038-be99-a006eb791ba7)
-
+# This is my GitHub Action Workflow File  -->  https://github.com/Pankaj8821/flask-app-deployment/blob/main/.github/workflows/flask-pipeline-main.yml
 
 # TERRAFORM
 # Create  S3 bucket  :
