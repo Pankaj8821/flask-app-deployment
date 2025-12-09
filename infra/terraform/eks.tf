@@ -112,6 +112,7 @@ resource "aws_eks_node_group" "ng" {
   ]
 }
 
+# Allow TCP/8080 from anywhere to the EKS cluster's cluster SG (works immediately)
 resource "aws_security_group_rule" "eks_allow_8080_from_internet" {
   type              = "ingress"
   description       = "Allow traffic to pods on port 8080 (for k8s Service type=LoadBalancer)"
@@ -120,9 +121,15 @@ resource "aws_security_group_rule" "eks_allow_8080_from_internet" {
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   ipv6_cidr_blocks  = ["::/0"]
-  security_group_id = aws_eks_cluster.eks.cluster_security_group_id
+
+  # correct attribute path for the cluster SG id:
+  security_group_id = aws_eks_cluster.eks.vpc_config[0].cluster_security_group_id
+
+  # ensure the EKS cluster is created first
+  depends_on = [aws_eks_cluster.eks]
 }
 
+# Explicit egress (optional; most EKS SGs already allow egress)
 resource "aws_security_group_rule" "eks_allow_all_egress_explicit" {
   type              = "egress"
   description       = "Allow all outbound traffic from cluster SG (explicit)"
@@ -131,6 +138,10 @@ resource "aws_security_group_rule" "eks_allow_all_egress_explicit" {
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
   ipv6_cidr_blocks  = ["::/0"]
-  security_group_id = aws_eks_cluster.eks.cluster_security_group_id
+
+  security_group_id = aws_eks_cluster.eks.vpc_config[0].cluster_security_group_id
+
+  depends_on = [aws_eks_cluster.eks]
 }
+
 
