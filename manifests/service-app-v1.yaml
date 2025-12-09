@@ -12,7 +12,6 @@ spec:
     version: v1
   type: LoadBalancer
   ports:
-  - name: containerPort
+  - name: http
     port: 8080
     targetPort: 8080
-
